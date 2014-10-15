@@ -50,7 +50,7 @@ void output(int *cell, int len, char fname[], char mode[])
 {
     int j;
     FILE *f = fopen(fname, mode);
-    for(j=0; j<len; j++)
+    for(j=1; j<len-1; j++)
     {
         if(cell[j]==1)
             fprintf(f, "*");
@@ -84,20 +84,23 @@ int main(int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     //Set the rule to use.
-    rule = &rule030;
+    rule = &rule022;
     char fname[48];
     sprintf(fname, "out.dat.%03d", rank);
 
-    int len_global = size*(200/size);  //Size of the world!
+    int len_global = size*(1000/size);  //Size of the world!
     int len_local = len_global/size+2;    //Size of my world!
-    int N = 200;                        //Age of the universe.
+    int N = 1000;                        //Age of the universe.
     int *cells = (int *)malloc(len_local * sizeof(int));
     
     //Initialize
     int i;
     for(i=0; i<len_local; i++)
         cells[i] = 0;
-    cells[len_local/2] = 1;
+    i = len_global/2;
+    if(i >= rank*(len_local-2) && i < (rank+1)*(len_local-2))
+        cells[i%(len_local-2) + 1] = 1;
+    //cells[len_local/2] = 1;
 
     //Evolve
     evolve(cells, len_local, N, fname);
