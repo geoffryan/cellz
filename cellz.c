@@ -83,14 +83,32 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+    if(argc != 3)
+    {
+        if(rank == 0)
+            printf("\nNeed to give a rule and a global size!\n\n");
+        MPI_Finalize();
+        return 0;
+    }
+
+    int choice, len_global;
+    sscanf(argv[1], "%d", &choice);
+    sscanf(argv[2], "%d", &len_global);
+
     //Set the rule to use.
-    rule = &rule022;
+    if(choice == 22)
+        rule = &rule022;
+    else if (choice == 30)
+        rule = &rule030;
+    else
+        rule = &rule000;
+
     char fname[48];
     sprintf(fname, "out.dat.%03d", rank);
 
-    int len_global = size*(1000/size);  //Size of the world!
-    int len_local = len_global/size+2;    //Size of my world!
-    int N = 1000;                        //Age of the universe.
+    len_global = size*(len_global/size);    //Size of the world!
+    int len_local = len_global/size+2;      //Size of my world!
+    int N = len_global;                     //Age of the universe.
     int *cells = (int *)malloc(len_local * sizeof(int));
     
     //Initialize
