@@ -4,8 +4,16 @@
 #include "cellz.h"
 #include "rules.h"
 
+/*
+ * A simulator for 1D Cellular Automata, in the style of Wolfram.  Parts of 
+ * the code are deliberately inefficient (ie. step() malloc'ing every time 
+ * its call) to easier demonstrate speed gains with parallelism.
+ */
+
+// Global function pointer.  Points to rule used in simulation.
 int (*rule)(int, int, int);
 
+// Advances *cell by a single iteration according to rule()
 void step(int *cell, int len)
 {
     int j;
@@ -20,22 +28,24 @@ void step(int *cell, int len)
     free(new_cell);
 }
 
-void output(int *dat, int len, char fname[], char mode[])
+//Prints the current *cell to a file fname.
+void output(int *cell, int len, char fname[], char mode[])
 {
     int j;
     FILE *f = fopen(fname, mode);
     for(j=0; j<len; j++)
     {
-        if(dat[j]==1)
+        if(cell[j]==1)
             fprintf(f, "*");
         else
             fprintf(f, " ");
-        //fprintf(f, "%d ", dat[j]);
+        //fprintf(f, "%d ", cell[j]);
     }
     fprintf(f, "\n");
     fclose(f);
 }
 
+//Evolves (initialized) cells N iterations, outputing each step.
 void evolve(int *cells, int len, int N, char fname[])
 {
     output(cells, len, fname, "w");
@@ -50,19 +60,23 @@ void evolve(int *cells, int len, int N, char fname[])
 
 int main(int argc, char *argv)
 {
+    //Set the rule to use.
     rule = &rule022;
 
-    int len = 100;
-    int N = 200;
+    int len = 100;  //Size of the world!
+    int N = 200;    //Age of the universe.
     int *cells = (int *)malloc(len * sizeof(int));
     
+    //Initialize
     int i;
     for(i=0; i<len; i++)
         cells[i] = 0;
     cells[len/2] = 1;
 
+    //Evolve
     evolve(cells, len, N, "out.dat");
 
+    //Clean
     free(cells);
     return 0;
 }
