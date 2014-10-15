@@ -58,13 +58,26 @@ void evolve(int *cells, int len, int N, char fname[])
     }
 }
 
-int main(int argc, char *argv)
+int main(int argc, char *argv[])
 {
-    //Set the rule to use.
-    rule = &rule030;
+    if(argc != 3)
+    {
+        return 0;
+    }
 
-    int len = 100;  //Size of the world!
-    int N = 200;    //Age of the universe.
+    int choice, len;
+    sscanf(argv[1], "%d", &choice);
+    sscanf(argv[2], "%d", &len);
+
+    //Set the rule to use.
+    if(choice == 22)
+        rule = &rule022;
+    else if (choice == 30)
+        rule = &rule030;
+    else
+        rule = &rule000;
+
+    int N = len;    //Age of the universe.
     int *cells = (int *)malloc(len * sizeof(int));
     
     //Initialize
