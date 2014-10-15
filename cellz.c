@@ -61,7 +61,7 @@ void evolve(int *cells, int len, int N, char fname[])
 int main(int argc, char *argv)
 {
     //Set the rule to use.
-    rule = &rule022;
+    rule = &rule030;
 
     int len = 100;  //Size of the world!
     int N = 200;    //Age of the universe.
